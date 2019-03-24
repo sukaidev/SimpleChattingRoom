@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">SimpleChattingRoom</string>
+    <string name="chatting_room">聊天室</string>
+    <string name="nick_name">昵称</string>
+    <string name="join_chat">加入聊天</string>
+    <string name="send_message">发送</string>
+</resources>
