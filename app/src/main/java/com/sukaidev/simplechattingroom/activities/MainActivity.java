@@ -1,5 +1,6 @@
 package com.sukaidev.simplechattingroom.activities;
 
+import android.content.Intent;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -18,7 +19,6 @@ public class MainActivity extends AppCompatActivity {
     private TextInputEditText mEditTxt;
 
     private AlertDialog mDialog;
-//    private OnClientConnectedListener mListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,18 +52,13 @@ public class MainActivity extends AppCompatActivity {
         String name = mEditTxt.getText().toString();
         if (!name.equals("")) {
             mDialog.dismiss();
+            Intent intent = new Intent(MainActivity.this,RoomActivity.class);
+            intent.putExtra("name",name);
+            startActivity(intent);
         } else {
             mDialog.dismiss();
             mEditTxt.setError("请输入昵称！");
         }
     }
 
-
-/*    public interface OnClientConnectedListener {
-        void startChat(ServerInfo info);
-    }
-
-    public void setOnClientConnectedListener(OnClientConnectedListener listener) {
-        this.mListener = listener;
-    }*/
 }

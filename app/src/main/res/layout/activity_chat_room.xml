@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="10" />
 
-    <LinearLayout
+    <android.support.v7.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="15dp"
         android:layout_weight="1"
@@ -40,7 +40,7 @@
             android:textColor="@android:color/white"
             android:textSize="20sp" />
 
-    </LinearLayout>
+    </android.support.v7.widget.LinearLayoutCompat>
 
 
 </android.support.v7.widget.LinearLayoutCompat>

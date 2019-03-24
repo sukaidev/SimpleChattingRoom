@@ -10,8 +10,8 @@
 
     <com.sukaidev.simplechattingroom.view.ProfilePhotoView
         android:id="@+id/left_photo_view"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         app:format="circle"
         app:src="@drawable/profile_photo_00" />
 
@@ -27,6 +27,7 @@
             android:layout_marginStart="3dp"
             android:layout_marginLeft="3dp"
             android:gravity="start"
+            android:maxWidth="274dp"
             android:text="@string/app_name"
             android:textColor="@android:color/darker_gray"
             android:textSize="16sp" />
@@ -34,7 +35,7 @@
 
         <android.support.v7.widget.LinearLayoutCompat
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="60dp"
             android:layout_marginStart="3dp"
             android:layout_marginLeft="3dp"
             android:background="@drawable/message_left">

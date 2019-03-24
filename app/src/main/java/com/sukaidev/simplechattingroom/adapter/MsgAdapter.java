@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.sukaidev.simplechattingroom.R;
-import com.sukaidev.simplechattingroom.bean.MessageInfo;
+import com.sukaidev.simplechattingroom.bean.Msg;
 import com.sukaidev.simplechattingroom.view.ProfilePhotoView;
 
 import java.util.ArrayList;
@@ -20,16 +20,16 @@ import java.util.ArrayList;
  */
 public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.MsgViewHolder> {
 
-    private static final int TYPE_LEFT = 0;
-    private static final int TYPE_RIGHT = 1;
+    private static final int TYPE_LEFT = Msg.TYPE_RECEIVED;
+    private static final int TYPE_RIGHT = Msg.TYPE_SENT;
 
-    private LinearLayoutCompat leftLayout;
-    private LinearLayoutCompat rightLayout;
+    private View leftLayout;
+    private View rightLayout;
 
     private Context context;
-    private ArrayList<MessageInfo> data;
+    private ArrayList<Msg> data;
 
-    public MsgAdapter(Context context, ArrayList<MessageInfo> data) {
+    public MsgAdapter(Context context, ArrayList<Msg> data) {
         this.context = context;
         this.data = data;
     }
@@ -39,23 +39,23 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.MsgViewHolder> {
     @Override
     public MsgViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         if (viewType == TYPE_LEFT) {
-            leftLayout = (LinearLayoutCompat) LayoutInflater.from(context).inflate(R.layout.msg_left, viewGroup);
+            leftLayout = LayoutInflater.from(context).inflate(R.layout.msg_left, viewGroup, false);
             return new MsgViewHolder(leftLayout);
         } else {
-            rightLayout = (LinearLayoutCompat) LayoutInflater.from(context).inflate(R.layout.msg_right, viewGroup);
+            rightLayout = LayoutInflater.from(context).inflate(R.layout.msg_right, viewGroup, false);
             return new MsgViewHolder(rightLayout);
         }
     }
 
     @Override
     public void onBindViewHolder(@NonNull MsgViewHolder msgViewHolder, int position) {
-        MessageInfo msg = data.get(position);
-        if (msg.getType() == TYPE_LEFT) {
-            msgViewHolder.profilePhoto.setImageResource(R.drawable.profile_photo_01);
-            msgViewHolder.userName.setText(msg.getUser());
+        Msg msg = data.get(position);
+        if (msg.getType() == TYPE_RIGHT) {
+            msgViewHolder.profilePhoto.setImageResource(R.drawable.profile_photo_00);
             msgViewHolder.content.setText(msg.getContent());
         } else {
-            msgViewHolder.profilePhoto.setImageResource(R.drawable.profile_photo_00);
+            msgViewHolder.profilePhoto.setImageResource(R.drawable.profile_photo_01);
+            msgViewHolder.userName.setText(msg.getName());
             msgViewHolder.content.setText(msg.getContent());
         }
     }
@@ -65,9 +65,21 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.MsgViewHolder> {
         if (data != null) {
             return data.size();
         }
-        return 0;
+        return -1;
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        Msg msg = data.get(position);
+        if (msg != null) {
+            if (msg.getType() == Msg.TYPE_SENT) {
+                return TYPE_RIGHT;
+            } else {
+                return TYPE_LEFT;
+            }
+        }
+        return TYPE_RIGHT;
+    }
 
     class MsgViewHolder extends RecyclerView.ViewHolder {
 
