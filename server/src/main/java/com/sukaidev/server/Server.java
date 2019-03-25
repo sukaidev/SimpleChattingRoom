@@ -17,7 +17,7 @@ public class Server {
         TCPServer server = new TCPServer(Constants.PORT_TCP_SERVER);
         server.start();
 
-        // 发送消息到每个客户端，用于测试
+/*        // 发送消息到每个客户端，用于测试
         if (server.start()) {
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
             String str;
@@ -32,7 +32,7 @@ public class Server {
             }
         } else {
             System.out.println("Start tcp server failed!");
-        }
+        }*/
     }
 
 }

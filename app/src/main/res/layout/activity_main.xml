@@ -9,58 +9,63 @@
 
     <include layout="@layout/widget_toolbar" />
 
-    <android.support.v7.widget.LinearLayoutCompat
+
+    <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="36dp"
-        android:layout_marginLeft="36dp"
-        android:layout_marginTop="72dp"
-        android:layout_marginEnd="36dp"
-        android:orientation="vertical">
+        android:layout_height="wrap_content">
 
-        <com.sukaidev.simplechattingroom.view.ProfilePhotoView
-            android:id="@+id/profile_photo"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:layout_gravity="center"
-            app:format="rectangle"
-            app:radius="0"
-            app:src="@drawable/profile_photo_00" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="5dp"
-            android:text="@string/change_profile_photo"
-            android:textSize="12sp" />
-
-        <android.support.design.widget.TextInputLayout
+        <android.support.v7.widget.LinearLayoutCompat
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="56dp">
+            android:layout_marginStart="36dp"
+            android:layout_marginLeft="36dp"
+            android:layout_marginTop="72dp"
+            android:layout_marginEnd="36dp"
+            android:orientation="vertical">
 
-            <android.support.design.widget.TextInputEditText
-                android:id="@+id/nick_name"
+            <com.sukaidev.simplechattingroom.view.ProfilePhotoView
+                android:id="@+id/profile_photo"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_gravity="center"
+                app:format="rectangle"
+                app:radius="0"
+                app:src="@drawable/profile_photo_00" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="5dp"
+                android:text="@string/change_profile_photo"
+                android:textSize="12sp" />
+
+            <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:hint="@string/nick_name"
-                android:inputType="text"
-                android:maxLength="32"
-                android:maxLines="1" />
-        </android.support.design.widget.TextInputLayout>
+                android:layout_height="wrap_content"
+                android:layout_marginTop="56dp">
 
-        <android.support.v7.widget.AppCompatButton
-            android:id="@+id/join_chat"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="56dp"
-            android:background="@android:color/holo_orange_dark"
-            android:text="@string/join_chat"
-            android:textColor="@android:color/white" />
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/nick_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:hint="@string/nick_name"
+                    android:inputType="text"
+                    android:maxLength="32"
+                    android:maxLines="1" />
+            </android.support.design.widget.TextInputLayout>
 
-    </android.support.v7.widget.LinearLayoutCompat>
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/join_chat"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="56dp"
+                android:background="@android:color/holo_orange_dark"
+                android:text="@string/join_chat"
+                android:textColor="@android:color/white" />
 
+        </android.support.v7.widget.LinearLayoutCompat>
 
+    </android.support.v4.widget.NestedScrollView>
 </LinearLayout>
