@@ -2,7 +2,6 @@ package com.sukaidev.simplechattingroom.adapter;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -52,11 +51,11 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.MsgViewHolder> {
     public void onBindViewHolder(@NonNull MsgViewHolder msgViewHolder, int position) {
         Msg msg = data.get(position);
         if (msg.getType() == TYPE_RIGHT) {
-            msgViewHolder.profilePhoto.setImageResource(R.drawable.profile_photo_00);
+            msgViewHolder.profilePhoto.setImageResource(msg.getProfilePhotoId());
             msgViewHolder.content.setText(msg.getContent());
         } else {
-            msgViewHolder.profilePhoto.setImageResource(R.drawable.profile_photo_01);
-            msgViewHolder.userName.setText(msg.getName());
+            msgViewHolder.profilePhoto.setImageResource(msg.getProfilePhotoId());
+            msgViewHolder.userName.setText(msg.getUser());
             msgViewHolder.content.setText(msg.getContent());
         }
     }

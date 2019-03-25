@@ -3,10 +3,8 @@ package com.sukaidev.client;
 import com.sukaidev.lib.Constants;
 import com.sukaidev.lib.utils.CloseUtils;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Inet4Address;
 import java.net.InetSocketAddress;
@@ -143,8 +141,7 @@ public class Client {
                     try {
                         outputStream.write(str.getBytes());
                         listener.onSend(str);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    } catch (Exception ignored) {
                     }
                 }
             });

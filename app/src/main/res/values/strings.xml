@@ -4,4 +4,6 @@
     <string name="nick_name">昵称</string>
     <string name="join_chat">加入聊天</string>
     <string name="send_message">发送</string>
+    <string name="message_hint">输入聊天内容</string>
+    <string name="change_profile_photo">点击切换头像</string>
 </resources>

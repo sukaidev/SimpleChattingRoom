@@ -2,12 +2,12 @@ package com.sukaidev.lib.utils;
 
 /**
  * Created by sukaidev on 2019/03/18.
- * å­—èŠ‚å·¥å…·ç±».
+ * ×Ö½Ú¹¤¾ßÀà.
  */
 public class ByteUtils {
 
     /**
-     * å­—èŠ‚æ•°ç»„è½¬åŒ–ä¸ºæ•´å‹æ•°æ®
+     * ×Ö½ÚÊı×é×ª»¯ÎªÕûĞÍÊı¾İ
      *
      * @param b
      * @return
@@ -17,7 +17,7 @@ public class ByteUtils {
     }
 
     /**
-     * æ•´å‹æ•°æ®è½¬åŒ–ä¸ºå­—èŠ‚æ•°ç»„
+     * ÕûĞÍÊı¾İ×ª»¯Îª×Ö½ÚÊı×é
      *
      * @param a
      * @return
@@ -28,7 +28,7 @@ public class ByteUtils {
     }
 
     /**
-     * åˆ¤æ–­æ•°æ®æ—¶å€™åŒ…å«åè®®å¤´
+     * ÅĞ¶ÏÊı¾İÊ±ºò°üº¬Ğ­ÒéÍ·
      *
      * @param data
      * @param head

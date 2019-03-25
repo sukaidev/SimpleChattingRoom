@@ -11,7 +11,6 @@ import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -27,6 +26,7 @@ import java.util.ArrayList;
 
 /**
  * Created by sukaidev on 2019/03/18.
+ * 聊天室.
  */
 public class RoomActivity extends AppCompatActivity implements Client.OnReadHandlerListener, Client.OnWriteHandlerListener {
 
@@ -38,6 +38,8 @@ public class RoomActivity extends AppCompatActivity implements Client.OnReadHand
     private ArrayList<Msg> mData = new ArrayList<>();
 
     private String mName;
+
+    private int mProfileId;
 
     private Client mClient;
 
@@ -60,6 +62,7 @@ public class RoomActivity extends AppCompatActivity implements Client.OnReadHand
         }
 
         mName = getIntent().getStringExtra("name");
+        mProfileId = getIntent().getIntExtra("profileId", R.drawable.profile_photo_00);
 
         mRecyclerView = findViewById(R.id.recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutCompat.VERTICAL, false));
@@ -121,7 +124,7 @@ public class RoomActivity extends AppCompatActivity implements Client.OnReadHand
                 if (content.equals("")) {
                     Toast.makeText(RoomActivity.this, "请填写消息内容！", Toast.LENGTH_SHORT).show();
                 } else {
-                    final Msg msg = new Msg(Msg.TYPE_SENT, mName, content);
+                    final Msg msg = new Msg(Msg.TYPE_SENT, mName, mProfileId, content);
                     final String json = JSON.toJSONString(msg);
                     client.send(json);
                     mHandler.sendEmptyMessage(1);

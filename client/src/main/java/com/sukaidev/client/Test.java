@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 
 /**
  * Created by sukaidev on 2019/03/24.
+ * ¿Í»§¶Ë²âÊÔÀà.
  */
 public class Test implements Client.OnReadHandlerListener, Client.OnWriteHandlerListener {
 
@@ -24,11 +25,11 @@ public class Test implements Client.OnReadHandlerListener, Client.OnWriteHandler
     }
 
     private static void write(Client client) throws IOException {
-        // æ„å»ºé”®ç›˜è¾“å…¥æµ
+        // ¹¹½¨¼üÅÌÊäÈëÁ÷
         InputStream in = System.in;
         BufferedReader input = new BufferedReader(new InputStreamReader(in));
         do {
-            // é”®ç›˜è¯»ä¸€è¡Œå°±å†™ä¸€è¡Œåˆ°æœåŠ¡å™¨
+            // ¼üÅÌ¶ÁÒ»ĞĞ¾ÍĞ´Ò»ĞĞµ½·şÎñÆ÷
             String str = input.readLine();
             client.send(str);
 
