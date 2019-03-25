@@ -15,6 +15,11 @@ public class Msg {
 
     private int type;
 
+    // 很关键
+    public Msg() {
+        super();
+    }
+
     public Msg(int type, String name, String content) {
         this.content = content;
         this.name = name;

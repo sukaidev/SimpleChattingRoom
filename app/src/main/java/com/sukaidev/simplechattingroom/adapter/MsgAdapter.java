@@ -29,6 +29,7 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.MsgViewHolder> {
     private Context context;
     private ArrayList<Msg> data;
 
+
     public MsgAdapter(Context context, ArrayList<Msg> data) {
         this.context = context;
         this.data = data;

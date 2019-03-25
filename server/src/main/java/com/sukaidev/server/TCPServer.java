@@ -13,10 +13,10 @@ import java.util.concurrent.TimeUnit;
  * Created by sukaidev on 2019/03/18.
  * TCP服务提供类.
  */
-public class TCPServer implements ClientHandler.ClientHandlerCallback {
+public class TCPServer implements ClientThread.ClientHandlerCallback {
     private final int port;
     private ClientListener mListener;
-    private List<ClientHandler> clientList = new ArrayList<>();
+    private List<ClientThread> clientList = new ArrayList<>();
     private final ThreadPoolExecutor forwardingThreadPool; // 转发单线程池
 
     TCPServer(int port) {
@@ -42,8 +42,8 @@ public class TCPServer implements ClientHandler.ClientHandlerCallback {
             mListener.exit();
         }
         synchronized (this) {
-            for (ClientHandler clientHandler : clientList) {
-                clientHandler.exit();
+            for (ClientThread clientThread : clientList) {
+                clientThread.exit();
             }
             clientList.clear();
         }
@@ -53,32 +53,33 @@ public class TCPServer implements ClientHandler.ClientHandlerCallback {
     }
 
     synchronized void broadcast(String str) {
-        for (ClientHandler clientHandler : clientList) {
-            clientHandler.send(str);
+        for (ClientThread clientThread : clientList) {
+            clientThread.send(str);
         }
     }
 
     @Override
-    public synchronized void onSelfClosed(ClientHandler handler) {
+    public synchronized void onSelfClosed(ClientThread handler) {
         clientList.remove(handler);
     }
 
     @Override
-    public void onNewMessageArrived(final ClientHandler handler, final String msg) {
-        // 打印到屏幕
-        System.out.println("Received-" + handler.getClientInfo() + ":" + msg);
-
+    public void onNewMessageArrived(final ClientThread handler, final String msg) {
+        // 如果只有一个客户端在线
+        if (clientList.size() == 1){
+            return;
+        }
         forwardingThreadPool.execute(new Runnable() {
-            @Override
+                @Override
             public void run() {
                 synchronized (this) {
-                    for (ClientHandler clientHandler : clientList) {
-                        if (clientHandler.equals(handler)) {
+                    for (ClientThread clientThread : clientList) {
+                        if (clientThread.equals(handler)) {
                             // 跳过自己
                             continue;
                         }
                         // 对其他客户端发送信息
-                        clientHandler.send(msg);
+                        clientThread.send(msg);
                     }
                 }
             }
@@ -109,10 +110,10 @@ public class TCPServer implements ClientHandler.ClientHandlerCallback {
                 }
                 try {
                     // 客户端构建异步线程
-                    ClientHandler clientHandler = new ClientHandler(client, TCPServer.this);
-                    clientHandler.readAndPrint();
+                    ClientThread clientThread = new ClientThread(client, TCPServer.this);
+                    clientThread.start();
                     synchronized (TCPServer.this) {
-                        clientList.add(clientHandler);
+                        clientList.add(clientThread);
                     }
                 } catch (IOException e) {
                     System.out.println("客户端连接异常：" + e.getMessage());

@@ -2,8 +2,7 @@
 <project version="4">
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/client/src/main/java/com/sukaidev/client/Client.java" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/client/src/main/java/com/sukaidev/client/Client.java" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/server/src/main/java/com/sukaidev/server/ClientHandler.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/server/src/main/java/com/sukaidev/server/ClientThread.java" charset="GBK" />
     <file url="file://$PROJECT_DIR$/server/src/main/java/com/sukaidev/server/Server.java" charset="GBK" />
     <file url="file://$PROJECT_DIR$/server/src/main/java/com/sukaidev/server/TCPServer.java" charset="GBK" />
   </component>

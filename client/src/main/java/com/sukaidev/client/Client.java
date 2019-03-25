@@ -7,39 +7,44 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintStream;
+import java.io.OutputStream;
 import java.net.Inet4Address;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by sukaidev on 2019/03/19.
- * 客户端消息处理类.
+ * 客户端主类.
  */
 public class Client {
 
     private final Socket socket;
     private final ReadHandler readHandler;
-    private final PrintStream printStream;
+    private final WriteHandler writeHandler;
 
-    public Client(Socket socket, ReadHandler readHandler) throws IOException {
+    private Client(Socket socket, ReadHandler readHandler, WriteHandler writeHandler) {
         this.socket = socket;
         this.readHandler = readHandler;
-        this.printStream = new PrintStream(socket.getOutputStream());
+        this.writeHandler = writeHandler;
     }
 
     public void exit() {
         readHandler.exit();
-        CloseUtils.close(printStream, socket);
+        writeHandler.exit();
+        CloseUtils.close(socket);
         System.out.println("客户端已退出~");
     }
 
     public void send(String msg) {
-        printStream.println(msg);
+        writeHandler.send(msg);
     }
 
-    public static Client start(OnReadHandlerListener listener) throws IOException {
+    public static Client start(OnReadHandlerListener readHandlerListener, OnWriteHandlerListener writeHandlerListener) throws IOException {
         Socket socket = new Socket();
 
         socket.setSoTimeout(3000);
@@ -51,10 +56,12 @@ public class Client {
         System.out.println("服务器信息：" + socket.getInetAddress() + " P:" + socket.getPort());
 
         try {
-            ReadHandler readHandler = new ReadHandler(socket.getInputStream(), listener);
+            ReadHandler readHandler = new ReadHandler(socket.getInputStream(), readHandlerListener);
             readHandler.start();
 
-            return new Client(socket, readHandler);
+            WriteHandler writeHandler = new WriteHandler(socket.getOutputStream(), writeHandlerListener);
+
+            return new Client(socket, readHandler, writeHandler);
         } catch (Exception e) {
             System.out.println("异常关闭");
         }
@@ -78,35 +85,29 @@ public class Client {
             super.run();
 
             try {
-                // 得到输入流，用于接收数据
-                BufferedReader socketInput = new BufferedReader(new InputStreamReader(inputStream));
+                int len;
+                byte[] b = new byte[1024 * 3];
 
                 do {
-                    String str;
                     try {
-                        // 客户端拿到一条数据
-                        str = socketInput.readLine();
+                        while ((len = inputStream.read(b)) != -1) {
+                            String str = new String(b, 0, len);
+                            System.out.println(str);
+                            listener.onReceive(str);
+                        }
                     } catch (SocketTimeoutException e) {
+                        //noinspection UnnecessaryContinue
                         continue;
                     }
-                    if (str == null) {
-                        System.out.println("连接已关闭，无法读取数据");
-                        break;
-                    }
-                    // 打印到屏幕，并处理数据
-                    System.out.println(str);
-                    listener.onReceive(str);
                 } while (!done);
-
-                socketInput.close();
 
             } catch (Exception e) {
                 if (!done) {
+                    e.printStackTrace();
                     System.out.println("连接异常断开" + e.getMessage());
                 }
             } finally {
-                // 连接关闭
-                CloseUtils.close(inputStream);
+                exit();
             }
         }
 
@@ -116,8 +117,52 @@ public class Client {
         }
     }
 
+    static class WriteHandler {
+        private boolean done = false;
+        private final OutputStream outputStream;
+        private final OnWriteHandlerListener listener;
+        private final ExecutorService executor;
+
+        WriteHandler(OutputStream os, OnWriteHandlerListener listener) {
+            this.outputStream = os;
+            this.listener = listener;
+            this.executor = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS,
+                    new ArrayBlockingQueue<Runnable>(100));
+        }
+
+        void send(final String str) {
+            if (done) {
+                return;
+            }
+            executor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    if (done) {
+                        return;
+                    }
+                    try {
+                        outputStream.write(str.getBytes());
+                        listener.onSend(str);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
+
+        void exit() {
+            done = true;
+            executor.shutdownNow();
+            CloseUtils.close(outputStream);
+        }
+    }
+
     public interface OnReadHandlerListener {
         void onReceive(String message);
+    }
+
+    public interface OnWriteHandlerListener {
+        void onSend(String message);
     }
 
 }

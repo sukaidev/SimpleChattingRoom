@@ -28,7 +28,7 @@ import java.util.ArrayList;
 /**
  * Created by sukaidev on 2019/03/18.
  */
-public class RoomActivity extends AppCompatActivity implements Client.OnReadHandlerListener {
+public class RoomActivity extends AppCompatActivity implements Client.OnReadHandlerListener, Client.OnWriteHandlerListener {
 
     private RecyclerView mRecyclerView;
     private MsgAdapter mAdapter;
@@ -73,7 +73,7 @@ public class RoomActivity extends AppCompatActivity implements Client.OnReadHand
             @Override
             public void run() {
                 try {
-                    final Client client = Client.start(RoomActivity.this);
+                    final Client client = Client.start(RoomActivity.this, RoomActivity.this);
                     if (client == null) {
                         mHandler.sendEmptyMessage(-1);
                     } else {
@@ -88,6 +88,55 @@ public class RoomActivity extends AppCompatActivity implements Client.OnReadHand
             }
         }).start();
 
+    }
+
+    @Override
+    public void onSend(String message) {
+        Msg msg = JSON.parseObject(message, Msg.class);
+        msg.setType(Msg.TYPE_SENT);
+        Message sendMessage = Message.obtain();
+        sendMessage.obj = msg;
+        sendMessage.what = 2;
+        mHandler.sendMessage(sendMessage);
+    }
+
+    @Override
+    public void onReceive(String message) {
+        Msg msg = JSON.parseObject(message, Msg.class);
+        msg.setType(Msg.TYPE_RECEIVED);
+        Message sendMessage = Message.obtain();
+        sendMessage.obj = msg;
+        sendMessage.what = 2;
+        mHandler.sendMessage(sendMessage);
+    }
+
+    private void initButtonClick(final Client client) {
+
+        mClient = client;
+
+        mBtnSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String content = mEdtContent.getText().toString();
+                if (content.equals("")) {
+                    Toast.makeText(RoomActivity.this, "请填写消息内容！", Toast.LENGTH_SHORT).show();
+                } else {
+                    final Msg msg = new Msg(Msg.TYPE_SENT, mName, content);
+                    final String json = JSON.toJSONString(msg);
+                    client.send(json);
+                    mHandler.sendEmptyMessage(1);
+                }
+            }
+        });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if (mClient != null) {
+            mClient.exit();
+        }
     }
 
     static class MainHandler extends Handler {
@@ -108,61 +157,19 @@ public class RoomActivity extends AppCompatActivity implements Client.OnReadHand
                         activity.finish();
                         break;
                     case 0:
-                        activity.initButton((Client) msg.obj);
+                        activity.initButtonClick((Client) msg.obj);
                         break;
                     case 1:
                         activity.mEdtContent.setText("");
+                        break;
+                    case 2:
+                        activity.mData.add((Msg) msg.obj);
+                        activity.mAdapter.notifyItemInserted(activity.mData.size() - 1);
                         break;
                     default:
                         break;
                 }
             }
-        }
-    }
-
-    private void initButton(final Client client) {
-
-        mClient = client;
-
-        mBtnSend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String content = mEdtContent.getText().toString();
-                if (content.equals("")) {
-                    Toast.makeText(RoomActivity.this, "请填写消息内容！", Toast.LENGTH_SHORT).show();
-                } else {
-                    final Msg msg = new Msg(Msg.TYPE_SENT, mName, content);
-                    mData.add(msg);
-                    mAdapter.notifyItemInserted(mData.size() - 1);
-                    final String json = JSON.toJSONString(msg);
-                    Log.d("button", json);
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            client.send(json);
-                            mHandler.sendEmptyMessage(1);
-                        }
-                    }).start();
-                }
-            }
-        });
-    }
-
-    @Override
-    public void onReceive(String message) {
-        Log.d("onReceive", message);
-        Msg msg = JSON.parseObject(message, Msg.class);
-        msg.setType(Msg.TYPE_RECEIVED);
-        mData.add(msg);
-        mAdapter.notifyItemInserted(mData.size() - 1);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        if (mClient != null) {
-            mClient.exit();
         }
     }
 }

@@ -18,8 +18,6 @@ public class MainActivity extends AppCompatActivity {
     private Button mBtnJoin;
     private TextInputEditText mEditTxt;
 
-    private AlertDialog mDialog;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,11 +31,6 @@ public class MainActivity extends AppCompatActivity {
         mBtnJoin = findViewById(R.id.join_chat);
         mEditTxt = findViewById(R.id.nick_name);
 
-        mDialog = new AlertDialog.Builder(this)
-                .setCancelable(false)
-                .setMessage("正在加入聊天室...")
-                .setTitle("Loading").create();
-
         mBtnJoin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -48,15 +41,12 @@ public class MainActivity extends AppCompatActivity {
 
     @SuppressWarnings("ConstantConditions")
     private void joinChat() {
-        mDialog.show();
         String name = mEditTxt.getText().toString();
         if (!name.equals("")) {
-            mDialog.dismiss();
-            Intent intent = new Intent(MainActivity.this,RoomActivity.class);
-            intent.putExtra("name",name);
+            Intent intent = new Intent(MainActivity.this, RoomActivity.class);
+            intent.putExtra("name", name);
             startActivity(intent);
         } else {
-            mDialog.dismiss();
             mEditTxt.setError("请输入昵称！");
         }
     }
