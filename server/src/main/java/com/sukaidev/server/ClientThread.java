@@ -15,7 +15,7 @@ import java.net.SocketTimeoutException;
 public class ClientThread extends Thread {
 
     private boolean done = false;
-    private final Socket socket;
+    private final Socket socket; // 与客户端建立连接的socket对象
     private final InputStream inputStream;
     private final OutputStream outputStream;
     private final ClientHandlerCallback clientHandlerCallback;
@@ -34,16 +34,18 @@ public class ClientThread extends Thread {
             int len;
             byte[] b = new byte[1024 * 3];
 
+            // 读取客户端消息，并转发到其他客户端，实现聊天室效果
             do {
                 try {
                     while ((len = inputStream.read(b)) != -1) {
                         String str = new String(b, 0, len);
-                        System.out.println(str);
+                        System.out.println(str); // 打印到屏幕，用于测试
+                        //  将消息发送到TCPServer中，方便处理
                         clientHandlerCallback.onNewMessageArrived(this, str);
                     }
                 } catch (SocketTimeoutException e) {
                     //noinspection UnnecessaryContinue
-                    continue;
+                    continue; // 防timeout
                 }
             }
             while (!done);
@@ -58,6 +60,10 @@ public class ClientThread extends Thread {
         }
     }
 
+    /**
+     * 将消息发送到客户端
+     * @param str
+     */
     void send(String str) {
         try {
             outputStream.write(str.getBytes());
@@ -73,6 +79,9 @@ public class ClientThread extends Thread {
     }
 
 
+    /**
+     * 自身退出时需要提醒服务端移除该客户端
+     */
     private void exitBySelf() {
         exit();
         clientHandlerCallback.onSelfClosed(this);

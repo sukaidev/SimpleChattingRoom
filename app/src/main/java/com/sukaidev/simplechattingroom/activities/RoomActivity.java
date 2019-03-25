@@ -72,6 +72,7 @@ public class RoomActivity extends AppCompatActivity implements Client.OnReadHand
         mEdtContent = findViewById(R.id.message_edit);
         mBtnSend = findViewById(R.id.send_message);
 
+        // 主线程无法使用网络
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -80,6 +81,7 @@ public class RoomActivity extends AppCompatActivity implements Client.OnReadHand
                     if (client == null) {
                         mHandler.sendEmptyMessage(-1);
                     } else {
+                        // 利用Handler将client对象发回主线程
                         Message message = Message.obtain();
                         message.obj = client;
                         message.what = 0;
@@ -91,8 +93,28 @@ public class RoomActivity extends AppCompatActivity implements Client.OnReadHand
             }
         }).start();
 
+        mBtnSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mClient == null) {
+                    Toast.makeText(RoomActivity.this, "未连接到服务器！", Toast.LENGTH_LONG).show();
+                } else {
+                    String content = mEdtContent.getText().toString();
+                    if (content.equals("")) {
+                        Toast.makeText(RoomActivity.this, "请填写消息内容！", Toast.LENGTH_SHORT).show();
+                    } else {
+                        final Msg msg = new Msg(Msg.TYPE_SENT, mName, mProfileId, content);
+                        final String json = JSON.toJSONString(msg);
+                        mClient.send(json);
+                        mHandler.sendEmptyMessage(1);
+                    }
+                }
+            }
+        });
+
     }
 
+    // 消息发送成功回调
     @Override
     public void onSend(String message) {
         Msg msg = JSON.parseObject(message, Msg.class);
@@ -103,6 +125,7 @@ public class RoomActivity extends AppCompatActivity implements Client.OnReadHand
         mHandler.sendMessage(sendMessage);
     }
 
+    // 接收到消息回调
     @Override
     public void onReceive(String message) {
         Msg msg = JSON.parseObject(message, Msg.class);
@@ -113,24 +136,8 @@ public class RoomActivity extends AppCompatActivity implements Client.OnReadHand
         mHandler.sendMessage(sendMessage);
     }
 
-    private void initButtonClick(final Client client) {
-
-        mClient = client;
-
-        mBtnSend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String content = mEdtContent.getText().toString();
-                if (content.equals("")) {
-                    Toast.makeText(RoomActivity.this, "请填写消息内容！", Toast.LENGTH_SHORT).show();
-                } else {
-                    final Msg msg = new Msg(Msg.TYPE_SENT, mName, mProfileId, content);
-                    final String json = JSON.toJSONString(msg);
-                    client.send(json);
-                    mHandler.sendEmptyMessage(1);
-                }
-            }
-        });
+    private void setClient(final Client client) {
+        this.mClient = client;
     }
 
     @Override
@@ -156,16 +163,20 @@ public class RoomActivity extends AppCompatActivity implements Client.OnReadHand
             if (activity != null) {
                 switch (msg.what) {
                     case -1:
+                        // 客户端为空
                         Toast.makeText(activity, "连接服务器失败！", Toast.LENGTH_LONG).show();
                         activity.finish();
                         break;
                     case 0:
-                        activity.initButtonClick((Client) msg.obj);
+                        // 客户端成功连接到服务端，保存Client对象
+                        activity.setClient((Client) msg.obj);
                         break;
                     case 1:
+                        // 成功发送消息，清空发送框
                         activity.mEdtContent.setText("");
                         break;
                     case 2:
+                        // 发送或接收到消息，进行界面刷新
                         activity.mData.add((Msg) msg.obj);
                         activity.mAdapter.notifyItemInserted(activity.mData.size() - 1);
                         break;

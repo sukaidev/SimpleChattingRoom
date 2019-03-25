@@ -14,9 +14,9 @@ import java.util.concurrent.TimeUnit;
  * TCP服务提供类.
  */
 public class TCPServer implements ClientThread.ClientHandlerCallback {
-    private final int port;
-    private ClientListener mListener;
-    private List<ClientThread> clientList = new ArrayList<>();
+    private final int port;     // 服务端端口
+    private ClientListener mListener;  // 连接监听
+    private List<ClientThread> clientList = new ArrayList<>();  //客户端集合
     private final ThreadPoolExecutor forwardingThreadPool; // 转发单线程池
 
     TCPServer(int port) {
@@ -24,6 +24,10 @@ public class TCPServer implements ClientThread.ClientHandlerCallback {
         this.forwardingThreadPool = new ThreadPoolExecutor(1, 1, 0, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(100));
     }
 
+    /**
+     * 服务端启动入口.
+     * @return 启动成功返回true
+     */
     boolean start() {
 
         try {
@@ -37,6 +41,9 @@ public class TCPServer implements ClientThread.ClientHandlerCallback {
         return true;
     }
 
+    /**
+     * 服务端终止入口.
+     */
     public void stop() {
         if (mListener != null) {
             mListener.exit();
@@ -52,17 +59,22 @@ public class TCPServer implements ClientThread.ClientHandlerCallback {
         forwardingThreadPool.shutdownNow();
     }
 
+    /**
+     * 向所有连接主机发送广播，用于测试
+     */
     synchronized void broadcast(String str) {
         for (ClientThread clientThread : clientList) {
             clientThread.send(str);
         }
     }
 
+    // 客户端关闭回调
     @Override
     public synchronized void onSelfClosed(ClientThread handler) {
         clientList.remove(handler);
     }
 
+    // 消息转发回调
     @Override
     public void onNewMessageArrived(final ClientThread handler, final String msg) {
         // 如果只有一个客户端在线
@@ -86,6 +98,9 @@ public class TCPServer implements ClientThread.ClientHandlerCallback {
         });
     }
 
+    /**
+     * 连接类
+     */
     private class ClientListener extends Thread {
         private ServerSocket server;
         private boolean done = false;
@@ -106,6 +121,7 @@ public class TCPServer implements ClientThread.ClientHandlerCallback {
                 try {
                     client = server.accept();
                 } catch (IOException e) {
+                    // 防timeout
                     continue;
                 }
                 try {
@@ -113,6 +129,7 @@ public class TCPServer implements ClientThread.ClientHandlerCallback {
                     ClientThread clientThread = new ClientThread(client, TCPServer.this);
                     clientThread.start();
                     synchronized (TCPServer.this) {
+                        // 将客户端加入集合中
                         clientList.add(clientThread);
                     }
                 } catch (IOException e) {

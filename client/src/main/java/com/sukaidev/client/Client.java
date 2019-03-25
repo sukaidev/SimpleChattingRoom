@@ -31,17 +31,17 @@ public class Client {
         this.writeHandler = writeHandler;
     }
 
-    public void exit() {
-        readHandler.exit();
-        writeHandler.exit();
-        CloseUtils.close(socket);
-        System.out.println("客户端已退出~");
-    }
-
+    /**
+     * 发送消息到服务端
+     * @param msg
+     */
     public void send(String msg) {
         writeHandler.send(msg);
     }
 
+    /**
+     * 客户端启动入口.
+     */
     public static Client start(OnReadHandlerListener readHandlerListener, OnWriteHandlerListener writeHandlerListener) throws IOException {
         Socket socket = new Socket();
 
@@ -66,7 +66,16 @@ public class Client {
         return null;
     }
 
+    public void exit() {
+        readHandler.exit();
+        writeHandler.exit();
+        CloseUtils.close(socket);
+        System.out.println("客户端已退出~");
+    }
 
+    /**
+     * 从服务端读取消息.
+     */
     static class ReadHandler extends Thread {
 
         private boolean done = false;
@@ -90,7 +99,7 @@ public class Client {
                     try {
                         while ((len = inputStream.read(b)) != -1) {
                             String str = new String(b, 0, len);
-                            System.out.println(str);
+                            // 回调onReceive，提醒app收到消息
                             listener.onReceive(str);
                         }
                     } catch (SocketTimeoutException e) {
@@ -115,6 +124,9 @@ public class Client {
         }
     }
 
+    /**
+     * 发送消息到服务端.
+     */
     static class WriteHandler {
         private boolean done = false;
         private final OutputStream outputStream;
@@ -140,6 +152,7 @@ public class Client {
                     }
                     try {
                         outputStream.write(str.getBytes());
+                        // 回调onSend，提醒app消息发送成功
                         listener.onSend(str);
                     } catch (Exception ignored) {
                     }
